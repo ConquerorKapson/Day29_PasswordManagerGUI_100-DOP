@@ -1,35 +1,88 @@
 from tkinter import *
+import random
+import array
 
 
 # ===================FUNCTIONALITY=========================
+
+
 def destroy_window(win):
     win.quit()
 
 
-def open_popup(entry):
+def open_error_popup(entry):
     top = Toplevel(window)
     top.config(padx=20, pady=20)
     # top.geometry("250x100")
-    top.title("Empty Password")
-    Label(top, text=f"your {entry} is empty! \n \n please fill in that first", padx=20, pady=20).grid(row=0, column=0)
-    ok_button = Button(top, text="ok")
-    ok_button.grid(row=1, column=0)
+    top.title(f"Empty {entry}")
+    Label(top, text=f"your {entry} is empty! \n \n please fill in that first").grid(row=0, column=1)
+    ok_button = Button(top, text="ok", height=1, width=10)
+    ok_button.grid(row=1, column=0, padx=10, pady=20)
+
+    cancel_button = Button(top, text="cancel", height=1, width=10)
+    cancel_button.grid(row=1, column=2, padx=10, pady=20)
 
 
+def confirm_entry_popup():
+    pass
 
+
+def copy_to_clipboard():
+    window.clipboard_clear()
+    window.clipboard_append(password_entry.get())
 
 
 def add_to_file():
     if website_entry.index("end") == 0:
-        open_popup("website")
+        open_error_popup("website")
     elif email_entry.index("end") == 0:
-        open_popup("email")
+        open_error_popup("email")
     elif password_entry.index("end") == 0:
-        open_popup("password")
+        open_error_popup("password")
     else:
         with open(file="password.txt", mode='a+') as passwords:
-            passwords.write(f"{website_entry.get()}   |  {email_entry.get()}   |  {password_entry.get()} \n")
+            passwords.write(f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n")
 
+
+def generate_password():
+    MAX_LEN = 12
+
+    DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    LOCASE_CHARACTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+                         'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q',
+                         'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+                         'z']
+
+    UPCASE_CHARACTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+                         'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q',
+                         'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+                         'Z']
+
+    SYMBOLS = ['@', '#', '$', '%', '=', ':', '?', '.', '/', '|', '~', '>',
+               '*', '(', ')', '<']
+
+    COMBINED_LIST = DIGITS + UPCASE_CHARACTERS + LOCASE_CHARACTERS + SYMBOLS
+
+    rand_digit = random.choice(DIGITS)
+    rand_upper = random.choice(UPCASE_CHARACTERS)
+    rand_lower = random.choice(LOCASE_CHARACTERS)
+    rand_symbol = random.choice(SYMBOLS)
+
+    temp_pass = rand_digit + rand_upper + rand_lower + rand_symbol
+
+    for x in range(MAX_LEN - 4):
+        temp_pass = temp_pass + random.choice(COMBINED_LIST)
+
+        temp_pass_list = array.array('u', temp_pass)
+        random.shuffle(temp_pass_list)
+
+    password = ""
+    for x in temp_pass_list:
+        password = password + x
+
+    password_entry.delete(0, END)
+    password_entry.insert(0, password)
+    copy_to_clipboard()
 
 
 # ==========================UI================================
@@ -62,7 +115,7 @@ password.grid(row=3, column=0, padx=10, pady=5)
 password_entry = Entry()
 password_entry.grid(row=3, column=1, padx=10, pady=5)
 
-generate_password_button = Button(text="Generate Password")
+generate_password_button = Button(text="Generate Password", command=generate_password)
 generate_password_button.grid(row=3, column=2, pady=5)
 
 add_button = Button(text="Add", command=add_to_file)
