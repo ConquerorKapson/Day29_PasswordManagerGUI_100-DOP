@@ -2,28 +2,16 @@ from tkinter import *
 import random
 import array
 
-
+ANSWER = False
 # ===================FUNCTIONALITY=========================
 
 
-def destroy_window(win):
-    win.quit()
+with open(file="password.txt", mode='a+') as password:
+    pass
 
 
-def open_error_popup(entry):
-    top = Toplevel(window)
-    top.config(padx=20, pady=20)
-    # top.geometry("250x100")
-    top.title(f"Empty {entry}")
-    Label(top, text=f"your {entry} is empty! \n \n please fill in that first").grid(row=0, column=1)
-    ok_button = Button(top, text="ok", height=1, width=10)
-    ok_button.grid(row=1, column=0, padx=10, pady=20)
+def redundant():
 
-    cancel_button = Button(top, text="cancel", height=1, width=10)
-    cancel_button.grid(row=1, column=2, padx=10, pady=20)
-
-
-def confirm_entry_popup():
     pass
 
 
@@ -32,7 +20,40 @@ def copy_to_clipboard():
     window.clipboard_append(password_entry.get())
 
 
-def add_to_file():
+def open_error_popup(entry):
+    top = Toplevel(window)
+    top.config(padx=20, pady=20)
+    top.title(f"Empty {entry}")
+    Label(top, text=f"your {entry} is empty! \n \n please fill in that first").grid(row=0, column=0)
+    ok_button = Button(top, text="ok", height=1, width=10, command=top.destroy)
+    ok_button.grid(row=1, column=0, padx=10, pady=20)
+
+
+def confirm_entry_popup():
+    def answer_is_yes():
+        add_to_file()
+        top.destroy()
+
+    def answer_is_no():
+        top.destroy()
+
+    top = Toplevel(window)
+    top.config(padx=20, pady=20)
+
+    confirm_message = Label(top, text=f"your website is :{website_entry.get()} \n "
+                                      f"your email/username is :{email_entry.get()} \n"
+                                      f"your password is :{password_entry.get()} \n"
+                                      f"Do you want to add these?\n")
+    confirm_message.grid(row=0, column=1, padx=20, pady=20)
+
+    yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
+    yes_button.grid(row=1, column=0)
+
+    no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
+    no_button.grid(row=1, column=2)
+
+
+def check_for_empty_entries():
     if website_entry.index("end") == 0:
         open_error_popup("website")
     elif email_entry.index("end") == 0:
@@ -40,14 +61,20 @@ def add_to_file():
     elif password_entry.index("end") == 0:
         open_error_popup("password")
     else:
-        with open(file="password.txt", mode='a+') as passwords:
-            passwords.write(f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n")
+        confirm_entry_popup()
+
+
+def add_to_file():
+    with open(file="password.txt", mode='a+') as passwords:
+        passwords.write(
+            f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n")
 
 
 def generate_password():
     MAX_LEN = 12
 
     DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
     LOCASE_CHARACTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
                          'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q',
                          'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
@@ -103,7 +130,7 @@ website.grid(row=1, column=0, padx=10, pady=5)
 website_entry = Entry()
 website_entry.grid(row=1, column=1, padx=10, pady=5)
 
-email = Label(text="Email")
+email = Label(text="Email/Username")
 email.grid(row=2, column=0, padx=10, pady=5)
 
 email_entry = Entry()
@@ -118,7 +145,7 @@ password_entry.grid(row=3, column=1, padx=10, pady=5)
 generate_password_button = Button(text="Generate Password", command=generate_password)
 generate_password_button.grid(row=3, column=2, pady=5)
 
-add_button = Button(text="Add", command=add_to_file)
+add_button = Button(text="Add", command=check_for_empty_entries)
 add_button.grid(row=4, column=1, pady=5)
 
 window.mainloop()
