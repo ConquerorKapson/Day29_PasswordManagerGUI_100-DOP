@@ -2,17 +2,22 @@ from tkinter import *
 import random
 import array
 
-ANSWER = False
 # ===================FUNCTIONALITY=========================
 
 
-with open(file="password.txt", mode='a+') as password:
+with open(file="password.txt", mode='a+') as password_file:
     pass
 
 
 def redundant():
+    is_redundant = False
+    password_file = open("password.txt")
 
-    pass
+    if f"{website_entry.get() :30}   |  {email_entry.get():30}" in password_file.read():
+        is_redundant = True
+    password_file.close()
+
+    return is_redundant
 
 
 def copy_to_clipboard():
@@ -29,28 +34,75 @@ def open_error_popup(entry):
     ok_button.grid(row=1, column=0, padx=10, pady=20)
 
 
+def add_to_file():
+    with open(file="password.txt", mode='a+') as passwords:
+        passwords.write(
+            f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n")
+
+
+def update_file():
+    test = f"{website_entry.get() :30}   |  {email_entry.get():30}"
+    password_file = open(file="password.txt", mode="r")
+    lines = password_file.readlines()
+    password_file.close()
+
+    for line in lines:
+
+        if test in line:
+            index = lines.index(line)
+            lines[index] = f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n"
+            password_file = open(file="password.txt", mode="w+")
+            password_file.truncate(0)
+            password_file.writelines(lines)
+            password_file.close
+            break
+
+
 def confirm_entry_popup():
-    def answer_is_yes():
-        add_to_file()
-        top.destroy()
+    if not redundant():
+        def answer_is_yes():
+            add_to_file()
+            top.destroy()
 
-    def answer_is_no():
-        top.destroy()
+        def answer_is_no():
+            top.destroy()
 
-    top = Toplevel(window)
-    top.config(padx=20, pady=20)
+        top = Toplevel(window)
+        top.config(padx=20, pady=20)
 
-    confirm_message = Label(top, text=f"your website is :{website_entry.get()} \n "
-                                      f"your email/username is :{email_entry.get()} \n"
-                                      f"your password is :{password_entry.get()} \n"
-                                      f"Do you want to add these?\n")
-    confirm_message.grid(row=0, column=1, padx=20, pady=20)
+        confirm_message = Label(top, text=f"your website is :{website_entry.get()} \n "
+                                          f"your email/username is :{email_entry.get()} \n"
+                                          f"your password is :{password_entry.get()} \n"
+                                          f"Do you want to add these?\n")
+        confirm_message.grid(row=0, column=1, padx=20, pady=20)
 
-    yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
-    yes_button.grid(row=1, column=0)
+        yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
+        yes_button.grid(row=1, column=0)
 
-    no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
-    no_button.grid(row=1, column=2)
+        no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
+        no_button.grid(row=1, column=2)
+    else:
+        def answer_is_yes():
+            update_file()
+            top.destroy()
+
+        def answer_is_no():
+            top.destroy()
+
+        top = Toplevel(window)
+        top.config(padx=20, pady=20)
+
+        confirm_message = Label(top, text=f"Your password for website: {website_entry.get()}\n"
+                                          f"and email/username: {email_entry.get()} already exists\n"
+                                          f"Do you want to update the password?")
+        confirm_message.grid(row=0, column=1, padx=20, pady=20)
+
+        yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
+        yes_button.grid(row=1, column=0)
+
+        no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
+        no_button.grid(row=1, column=2)
+        # print("redundancy found")
 
 
 def check_for_empty_entries():
@@ -62,12 +114,6 @@ def check_for_empty_entries():
         open_error_popup("password")
     else:
         confirm_entry_popup()
-
-
-def add_to_file():
-    with open(file="password.txt", mode='a+') as passwords:
-        passwords.write(
-            f"{website_entry.get() :30}   |  {email_entry.get():30}   |  {password_entry.get():30} \n")
 
 
 def generate_password():
