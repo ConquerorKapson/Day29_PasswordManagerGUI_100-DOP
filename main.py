@@ -3,7 +3,7 @@ import random
 import array
 
 # ===================FUNCTIONALITY=========================
-
+from tkinter import messagebox
 
 with open(file="password.txt", mode='a+') as password_file:
     pass
@@ -26,12 +26,7 @@ def copy_to_clipboard():
 
 
 def open_error_popup(entry):
-    top = Toplevel(window)
-    top.config(padx=20, pady=20)
-    top.title(f"Empty {entry}")
-    Label(top, text=f"your {entry} is empty! \n \n please fill in that first").grid(row=0, column=0)
-    ok_button = Button(top, text="ok", height=1, width=10, command=top.destroy)
-    ok_button.grid(row=1, column=0, padx=10, pady=20)
+    messagebox.showwarning(title="Missing entry", message=f"your {entry} is empty! \n \n please fill in that first")
 
 
 def add_to_file():
@@ -60,49 +55,26 @@ def update_file():
 
 def confirm_entry_popup():
     if not redundant():
-        def answer_is_yes():
+
+        confirm_message = (f"your website is :{website_entry.get()} \n "
+                           f"your email/username is :{email_entry.get()} \n"
+                           f"your password is :{password_entry.get()} \n"
+                           f"Do you want to add these?\n")
+
+        ok = messagebox.askokcancel(title="Confirmation", message=confirm_message)
+
+        if ok:
             add_to_file()
-            top.destroy()
-
-        def answer_is_no():
-            top.destroy()
-
-        top = Toplevel(window)
-        top.config(padx=20, pady=20)
-
-        confirm_message = Label(top, text=f"your website is :{website_entry.get()} \n "
-                                          f"your email/username is :{email_entry.get()} \n"
-                                          f"your password is :{password_entry.get()} \n"
-                                          f"Do you want to add these?\n")
-        confirm_message.grid(row=0, column=1, padx=20, pady=20)
-
-        yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
-        yes_button.grid(row=1, column=0)
-
-        no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
-        no_button.grid(row=1, column=2)
     else:
-        def answer_is_yes():
+
+        confirm_message = (f"Your password for website: {website_entry.get()}\n"
+                           f"and email/username: {email_entry.get()} already exists\n"
+                           f"Do you want to update the password?")
+
+        ok = messagebox.askokcancel(title="Update?", message=confirm_message)
+
+        if ok:
             update_file()
-            top.destroy()
-
-        def answer_is_no():
-            top.destroy()
-
-        top = Toplevel(window)
-        top.config(padx=20, pady=20)
-
-        confirm_message = Label(top, text=f"Your password for website: {website_entry.get()}\n"
-                                          f"and email/username: {email_entry.get()} already exists\n"
-                                          f"Do you want to update the password?")
-        confirm_message.grid(row=0, column=1, padx=20, pady=20)
-
-        yes_button = Button(top, text="Yes", height=1, width=20, command=answer_is_yes)
-        yes_button.grid(row=1, column=0)
-
-        no_button = Button(top, text="No", height=1, width=20, command=answer_is_no)
-        no_button.grid(row=1, column=2)
-        # print("redundancy found")
 
 
 def check_for_empty_entries():
