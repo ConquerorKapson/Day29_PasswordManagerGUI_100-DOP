@@ -1,9 +1,9 @@
 from tkinter import *
 import random
 import array
+from tkinter import messagebox
 
 # ===================FUNCTIONALITY=========================
-from tkinter import messagebox
 
 with open(file="password.txt", mode='a+') as password_file:
     pass
