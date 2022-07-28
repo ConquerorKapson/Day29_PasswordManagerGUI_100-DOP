@@ -23,6 +23,7 @@ def open_error_popup(entry):
     messagebox.showwarning(title="Missing entry", message=f"your {entry} is empty! \n \n please fill in that first")
 
 
+# TODO add verification feature so that password is accessed by a verified person only
 def verified():
     return True
 
@@ -46,11 +47,9 @@ def find_password():
                     all_data = json.load(passwords)
                     your_password = all_data[f"{website_entry.get().lower()},{email_entry.get().lower()}"]['Password']
                     messagebox.showinfo(
-                        message=f"Your Password is : \n\n   {your_password} \n\nIt is copied to clipboard")
+                        message=f"Your Password is :  {your_password} \n\nIt is copied to clipboard")
                     copy_to_clipboard(your_password)
-            except JSONDecodeError:
-                messagebox.showinfo(message="Password for these entries does not exist")
-            except KeyError:
+            except (JSONDecodeError, KeyError):
                 messagebox.showinfo(message="Password for these entries does not exist")
             except FileNotFoundError:
                 messagebox.showinfo(message="There is no password added into your system")
